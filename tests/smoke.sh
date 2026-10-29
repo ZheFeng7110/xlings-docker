@@ -21,6 +21,7 @@ SMOKE_NETWORK="${SMOKE_NETWORK:-1}"
 SMOKE_DERIVED="${SMOKE_DERIVED:-${SMOKE_NETWORK}}"
 
 VOLUME="xlings-smoke-$$"
+RESTORE_VOLUME="xlings-smoke-restore-$$"
 TMPDIRS=()
 DERIVED_IMAGE="xlings-smoke-derived:$$"
 
@@ -39,7 +40,7 @@ cleanup() {
     for dir in ${TMPDIRS[@]+"${TMPDIRS[@]}"}; do
         cleanup_dir "$dir"
     done
-    docker volume rm -f "$VOLUME" >/dev/null 2>&1 || true
+    docker volume rm -f "$VOLUME" "$RESTORE_VOLUME" >/dev/null 2>&1 || true
     docker image rm -f "$DERIVED_IMAGE" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
@@ -115,6 +116,25 @@ esac
 case "$out" in
     *"$XLINGS_VERSION"*) ;;
     *) die "self-heal produced the wrong version:
+${out}" ;;
+esac
+
+section "self-heal over a home mount owned by another uid"
+# A bind-mounted home belongs to the host user, which is often not the
+# container's dev uid. Restoring the snapshot must not fail just because it
+# cannot apply the archive's mode and mtime to the mount point itself.
+# volume-nocopy keeps the volume empty so the entrypoint takes the restore path,
+# and a root-owned 0777 directory is writable but not owned by dev.
+run docker volume create "$RESTORE_VOLUME"
+run docker run --rm --user root --entrypoint sh \
+    --mount "type=volume,source=${RESTORE_VOLUME},target=/home/dev/.xlings,volume-nocopy" \
+    "$IMAGE" -c 'chown 0:0 /home/dev/.xlings; chmod 0777 /home/dev/.xlings'
+capture docker run --rm \
+    --mount "type=volume,source=${RESTORE_VOLUME},target=/home/dev/.xlings,volume-nocopy" \
+    "$IMAGE" xlings --version
+case "$out" in
+    *"home snapshot"*) ok "restored the snapshot over a foreign-owned mount" ;;
+    *) die "self-heal failed on a foreign-owned mount:
 ${out}" ;;
 esac
 

@@ -41,7 +41,11 @@ restore_home() {
     if [ "$XLINGS_HOME" = "$baked_home" ] && [ -f "$home_snapshot" ]; then
         log "xlings home ${XLINGS_HOME} is empty; restoring the image's home snapshot"
         mkdir -p "$XLINGS_HOME"
-        tar -xzf "$home_snapshot" -C "$XLINGS_HOME"
+        # --no-overwrite-dir: a bind mount's root belongs to the host user, so
+        # restoring the archive's metadata for "." (mode, mtime) fails with
+        # "Operation not permitted" and tar exits 2. Keep the mount point as the
+        # host set it up; everything inside is still restored.
+        tar --no-overwrite-dir -xzf "$home_snapshot" -C "$XLINGS_HOME"
         log "restored $(xlings --version 2>/dev/null || echo 'xlings (unknown version)')"
         return 0
     fi
