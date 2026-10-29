@@ -8,7 +8,8 @@
 # wants in an interactive container.
 
 ARG BASE_IMAGE=ubuntu:24.04
-# hadolint ignore=DL3006  # tagged by the BASE_IMAGE default above
+# The tag comes from the BASE_IMAGE default above.
+# hadolint ignore=DL3006
 FROM ${BASE_IMAGE}
 
 ARG BASE_IMAGE
