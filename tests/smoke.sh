@@ -53,6 +53,21 @@ run() {
     "$@"
 }
 
+# Like run, but capture combined output in $out. A failing command substitution
+# would otherwise abort the script under `set -e` without showing what the
+# container printed, which is exactly what is needed to debug a failure.
+capture() {
+    local status
+    out="$("$@" 2>&1)" && return 0
+    status=$?
+    if [ "$status" -ne 0 ]; then
+        printf '    $ %s\n' "$*"
+        printf '%s\n' "$out" | sed 's/^/    | /' >&2
+        printf '    FAIL: command exited %s\n' "$status" >&2
+        exit 1
+    fi
+}
+
 new_tmp() {
     # Sets NEW_TMP in the caller's shell. Do not call this through $(...):
     # a command substitution runs in a subshell, where the TMPDIRS update would
@@ -69,7 +84,7 @@ printf 'version: %s\n' "$XLINGS_VERSION"
 printf 'network: %s\n' "$SMOKE_NETWORK"
 
 section "image version"
-out="$(docker run --rm "$IMAGE" xlings --version)"
+capture docker run --rm "$IMAGE" xlings --version
 printf '    %s\n' "$out"
 case "$out" in
     *"$XLINGS_VERSION"*) ok "xlings reports ${XLINGS_VERSION}" ;;
@@ -77,12 +92,13 @@ case "$out" in
 esac
 
 section "default user"
-out="$(docker run --rm "$IMAGE" sh -c 'printf "%s %s" "$(id -u)" "$HOME"')"
+# shellcheck disable=SC2016  # expanded inside the container
+capture docker run --rm "$IMAGE" sh -c 'printf "%s %s" "$(id -u)" "$HOME"'
 [ "$out" = "${SMOKE_UID} /home/dev" ] || die "expected '${SMOKE_UID} /home/dev', got '${out}'"
 ok "runs as dev (uid ${SMOKE_UID}) with HOME=/home/dev"
 
 section "entrypoint passthrough"
-out="$(docker run --rm "$IMAGE" sh -c 'xlings --version')"
+capture docker run --rm "$IMAGE" sh -c 'xlings --version'
 case "$out" in
     *"$XLINGS_VERSION"*) ok "command form works" ;;
     *) die "passthrough failed: ${out}" ;;
@@ -90,7 +106,7 @@ esac
 
 section "self-heal over an empty home mount"
 new_tmp; dir="$NEW_TMP"
-out="$(docker run --rm -v "${dir}:/home/dev/.xlings" "$IMAGE" xlings --version 2>&1)"
+capture docker run --rm -v "${dir}:/home/dev/.xlings" "$IMAGE" xlings --version
 case "$out" in
     *"home snapshot"*) ok "restored the home offline from the image snapshot" ;;
     *) die "self-heal did not use the home snapshot:
@@ -107,7 +123,7 @@ docker run --rm "$IMAGE" xlings self doctor >/dev/null
 ok "home is healthy"
 
 section "root user with the image home"
-out="$(docker run --rm --user root -e XLINGS_HOME=/home/dev/.xlings "$IMAGE" xlings --version)"
+capture docker run --rm --user root -e XLINGS_HOME=/home/dev/.xlings "$IMAGE" xlings --version
 case "$out" in
     *"$XLINGS_VERSION"*) ok "xlings works as root too" ;;
     *) die "root run failed: ${out}" ;;
