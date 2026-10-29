@@ -1,0 +1,19 @@
+{
+  "name": "xlings",
+  "build": {
+    "dockerfile": "../../Dockerfile",
+    "context": "../.."
+  },
+  "remoteUser": "dev",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "mounts": [
+    "source=xlings-home,target=/home/dev/.xlings,type=volume"
+  ],
+  "postCreateCommand": "test -f .xlings.json && xlings install -y || true",
+  "customizations": {
+    "vscode": {
+      "extensions": []
+    }
+  }
+}

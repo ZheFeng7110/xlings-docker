@@ -1,0 +1,9 @@
+.git
+.gitignore
+.github
+.smoke*
+README.md
+examples
+tests
+*.md
+*.log

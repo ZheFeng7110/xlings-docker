@@ -1,0 +1,19 @@
+services:
+  xlings:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: xlings-docker:dev
+    working_dir: /workspace
+    command: ["bash"]
+    stdin_open: true
+    tty: true
+    environment:
+      # Opt in here if you want the project's .xlings.json installed on start.
+      XLINGS_AUTO_INSTALL: "0"
+    volumes:
+      - .:/workspace
+      - xlings-home:/home/dev/.xlings
+
+volumes:
+  xlings-home:
