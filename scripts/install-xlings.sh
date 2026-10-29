@@ -87,7 +87,9 @@ for candidate in "$extract_dir"/xlings-*/; do
         break
     fi
 done
-[ -n "$src" ] && [ -x "${src}/bin/xlings" ] || die "archive has no executable bin/xlings"
+if [ -z "$src" ] || [ ! -x "${src}/bin/xlings" ]; then
+    die "archive has no executable bin/xlings"
+fi
 
 install_user="${XLINGS_INSTALL_USER:-}"
 if [ "$(id -u)" -eq 0 ] && [ -n "$install_user" ]; then
