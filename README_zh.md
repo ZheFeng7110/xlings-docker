@@ -19,7 +19,7 @@ docker build -t xlings-docker:dev .
 # 或使用已发布镜像
 docker run --rm -it \
   -v xlings-home:/home/dev/.xlings \
-  ghcr.io/ZheFeng7110/xlings-docker:latest
+  ghcr.io/zhefeng7110/xlings-docker:latest
 ```
 
 进入容器后：
@@ -35,8 +35,8 @@ xlings remove node@20 -y
 `docker run` 需要 `-it` 才能获得完整的交互体验；非交互场景（CI）直接用命令形式：
 
 ```bash
-docker run --rm ghcr.io/ZheFeng7110/xlings-docker:latest xlings install -y node@20
-docker run --rm ghcr.io/ZheFeng7110/xlings-docker:latest xlings --version
+docker run --rm ghcr.io/zhefeng7110/xlings-docker:latest xlings install -y node@20
+docker run --rm ghcr.io/zhefeng7110/xlings-docker:latest xlings --version
 ```
 
 ## 项目级 `.xlings.json`
@@ -59,7 +59,7 @@ cd my-project
 docker run --rm -it \
   -v "$PWD:/workspace" \
   -v xlings-home:/home/dev/.xlings \
-  ghcr.io/ZheFeng7110/xlings-docker:latest
+  ghcr.io/zhefeng7110/xlings-docker:latest
 
 # 容器内（当前目录 /workspace）
 xlings install -y
@@ -75,7 +75,7 @@ docker run --rm -it \
   -e XLINGS_AUTO_INSTALL=1 \
   -v "$PWD:/workspace" \
   -v xlings-home:/home/dev/.xlings \
-  ghcr.io/ZheFeng7110/xlings-docker:latest
+  ghcr.io/zhefeng7110/xlings-docker:latest
 ```
 
 入口脚本会执行 `xlings install -y`；失败只打印提示，不阻塞进入 shell。CI 中也可以这样用：
@@ -84,7 +84,7 @@ docker run --rm -it \
 docker run --rm \
   -e XLINGS_AUTO_INSTALL=1 \
   -v "$PWD:/workspace" \
-  ghcr.io/ZheFeng7110/xlings-docker:latest \
+  ghcr.io/zhefeng7110/xlings-docker:latest \
   xlings list
 ```
 
@@ -114,7 +114,7 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev
 `USER dev` 会延续到后续 `RUN`，可以直接预装包：
 
 ```dockerfile
-FROM ghcr.io/ZheFeng7110/xlings-docker:2026.10.26.1
+FROM ghcr.io/zhefeng7110/xlings-docker:2026.10.26.1
 
 RUN xlings install -y -g ninja@1.12.1 node@20
 ```
@@ -185,7 +185,7 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev \
 | `latest` | 最新稳定组合 |
 | `sha-<short>` | 对应提交 |
 
-> 镜像发布到 `ghcr.io/<github-owner>/xlings-docker`，本仓库对应 `ghcr.io/ZheFeng7110/xlings-docker`。
+> 镜像发布到 `ghcr.io/<github-owner>/xlings-docker`，本仓库对应 `ghcr.io/zhefeng7110/xlings-docker`。
 
 ## devcontainer / compose
 

@@ -19,7 +19,7 @@ docker build -t xlings-docker:dev .
 # Or use the published image
 docker run --rm -it \
   -v xlings-home:/home/dev/.xlings \
-  ghcr.io/ZheFeng7110/xlings-docker:latest
+  ghcr.io/zhefeng7110/xlings-docker:latest
 ```
 
 Inside the container:
@@ -35,8 +35,8 @@ xlings remove node@20 -y
 `docker run` needs `-it` for the full interactive experience; for non-interactive use (CI), pass the command directly:
 
 ```bash
-docker run --rm ghcr.io/ZheFeng7110/xlings-docker:latest xlings install -y node@20
-docker run --rm ghcr.io/ZheFeng7110/xlings-docker:latest xlings --version
+docker run --rm ghcr.io/zhefeng7110/xlings-docker:latest xlings install -y node@20
+docker run --rm ghcr.io/zhefeng7110/xlings-docker:latest xlings --version
 ```
 
 ## Project-level `.xlings.json`
@@ -59,7 +59,7 @@ cd my-project
 docker run --rm -it \
   -v "$PWD:/workspace" \
   -v xlings-home:/home/dev/.xlings \
-  ghcr.io/ZheFeng7110/xlings-docker:latest
+  ghcr.io/zhefeng7110/xlings-docker:latest
 
 # Inside the container (current directory is /workspace)
 xlings install -y
@@ -75,7 +75,7 @@ docker run --rm -it \
   -e XLINGS_AUTO_INSTALL=1 \
   -v "$PWD:/workspace" \
   -v xlings-home:/home/dev/.xlings \
-  ghcr.io/ZheFeng7110/xlings-docker:latest
+  ghcr.io/zhefeng7110/xlings-docker:latest
 ```
 
 The entrypoint runs `xlings install -y`; a failure only prints a notice and does not block entry into the shell. This also works in CI:
@@ -84,7 +84,7 @@ The entrypoint runs `xlings install -y`; a failure only prints a notice and does
 docker run --rm \
   -e XLINGS_AUTO_INSTALL=1 \
   -v "$PWD:/workspace" \
-  ghcr.io/ZheFeng7110/xlings-docker:latest \
+  ghcr.io/zhefeng7110/xlings-docker:latest \
   xlings list
 ```
 
@@ -115,7 +115,7 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev
 `USER dev` carries over to subsequent `RUN` instructions, so packages can be preinstalled directly:
 
 ```dockerfile
-FROM ghcr.io/ZheFeng7110/xlings-docker:2026.10.26.1
+FROM ghcr.io/zhefeng7110/xlings-docker:2026.10.26.1
 
 RUN xlings install -y -g ninja@1.12.1 node@20
 ```
@@ -186,7 +186,7 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev \
 | `latest` | Latest stable combination |
 | `sha-<short>` | Corresponding commit |
 
-> The image is published to `ghcr.io/<github-owner>/xlings-docker`; for this repository that is `ghcr.io/ZheFeng7110/xlings-docker`.
+> The image is published to `ghcr.io/<github-owner>/xlings-docker`; for this repository that is `ghcr.io/zhefeng7110/xlings-docker`.
 
 ## devcontainer / compose
 
