@@ -115,7 +115,7 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev
 `USER dev` carries over to subsequent `RUN` instructions, so packages can be preinstalled directly:
 
 ```dockerfile
-FROM ghcr.io/zhefeng7110/xlings-docker:2026.10.26.1
+FROM ghcr.io/zhefeng7110/xlings-docker:2026.11.16.1
 
 RUN xlings install -y -g ninja@1.12.1 node@20
 ```
@@ -151,7 +151,7 @@ Common build arguments:
 | Argument | Default | Description |
 |---|---|---|
 | `BASE_IMAGE` | `debian:trixie-slim` | Base image; CI tests Debian trixie, Ubuntu 24.04 is known to work too |
-| `XLINGS_VERSION` | `2026.10.26.1` | Pinned xlings release version |
+| `XLINGS_VERSION` | `2026.11.16.1` | Pinned xlings release version |
 | `XLINGS_DOWNLOAD_BASE` | GitHub releases | Base URL for release downloads; can point at a mirror |
 | `XLINGS_DEFAULT_MIRROR` | `GLOBAL` | Default package index mirror written into the home (`GLOBAL` / `CN`) |
 | `XLINGS_PACKAGES` | empty | Packages to preinstall at build time, space-separated |
@@ -181,8 +181,8 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev \
 
 | Tag | Contents |
 |---|---|
-| `2026.10.26.1` | Pinned xlings version |
-| `2026.10.26.1-debian-trixie` | Version + base image |
+| `2026.11.16.1` | Pinned xlings version |
+| `2026.11.16.1-debian-trixie` | Version + base image |
 | `latest` | Latest stable combination |
 | `sha-<short>` | Corresponding commit |
 
