@@ -1,6 +1,6 @@
 IMAGE ?= xlings-docker
 TAG ?= dev
-BASE_IMAGE ?= ubuntu:24.04
+BASE_IMAGE ?= debian:trixie-slim
 DEV_UID ?= 1000
 DEV_GID ?= 1000
 XLINGS_DEFAULT_MIRROR ?= GLOBAL
@@ -8,6 +8,7 @@ XLINGS_DOWNLOAD_BASE ?= https://github.com/openxlings/xlings/releases/download
 PLATFORMS ?= linux/amd64,linux/arm64
 XLINGS_VERSION ?= $(shell sed -n 's/^ARG XLINGS_VERSION=//p' Dockerfile)
 NINJA_VERSION ?= 1.12.1
+NODE_VERSION ?= 24.21.0
 
 BUILD_ARGS = \
 	--build-arg BASE_IMAGE=$(BASE_IMAGE) \
@@ -32,7 +33,7 @@ build:
 	docker build $(BUILD_ARGS) -t $(IMAGE):$(TAG) .
 
 smoke:
-	IMAGE=$(IMAGE):$(TAG) XLINGS_VERSION=$(XLINGS_VERSION) NINJA_VERSION=$(NINJA_VERSION) \
+	IMAGE=$(IMAGE):$(TAG) XLINGS_VERSION=$(XLINGS_VERSION) NINJA_VERSION=$(NINJA_VERSION) NODE_VERSION=$(NODE_VERSION) \
 		SMOKE_UID=$(DEV_UID) ./tests/smoke.sh
 
 test: build smoke

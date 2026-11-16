@@ -149,7 +149,7 @@ make push           # 推送 IMAGE:TAG，先 docker login ghcr.io
 
 | 参数 | 默认值 | 说明 |
 |---|---|---|
-| `BASE_IMAGE` | `ubuntu:24.04` | 基础镜像（目前只测试 Ubuntu 24.04） |
+| `BASE_IMAGE` | `debian:trixie-slim` | 基础镜像；CI 测试的是 Debian trixie，Ubuntu 24.04 也可用 |
 | `XLINGS_VERSION` | `2026.10.26.1` | 固定的 xlings release 版本 |
 | `XLINGS_DOWNLOAD_BASE` | GitHub releases | release 下载基地址，可换镜像源 |
 | `XLINGS_DEFAULT_MIRROR` | `GLOBAL` | 写入 home 的默认索引镜像（`GLOBAL` / `CN`） |
@@ -181,7 +181,7 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev \
 | Tag | 内容 |
 |---|---|
 | `2026.10.26.1` | 固定 xlings 版本 |
-| `2026.10.26.1-ubuntu24.04` | 版本 + 基础镜像 |
+| `2026.10.26.1-debian-trixie` | 版本 + 基础镜像 |
 | `latest` | 最新稳定组合 |
 | `sha-<short>` | 对应提交 |
 

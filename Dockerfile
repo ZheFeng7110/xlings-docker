@@ -7,7 +7,7 @@
 # the glibc userland that indexed packages expect, plus the tools a developer
 # wants in an interactive container.
 
-ARG BASE_IMAGE=ubuntu:24.04
+ARG BASE_IMAGE=debian:trixie-slim
 # The tag comes from the BASE_IMAGE default above.
 # hadolint ignore=DL3006
 FROM ${BASE_IMAGE}
@@ -44,8 +44,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # A predictable uid/gid (1000 by default) keeps bind-mounted project files
-# owned by the host user. Ubuntu 24.04 base images already carry a uid 1000
-# account, so replace it instead of failing on a duplicate id.
+# owned by the host user. debian:trixie-slim ships no uid 1000 account, but
+# other bases (ubuntu:24.04 for one) do, so replace an existing one instead
+# of failing on a duplicate id.
 RUN set -eux; \
     if getent passwd "${DEV_UID}" >/dev/null; then \
         userdel -r "$(getent passwd "${DEV_UID}" | cut -d: -f1)" 2>/dev/null || true; \

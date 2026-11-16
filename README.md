@@ -150,7 +150,7 @@ Common build arguments:
 
 | Argument | Default | Description |
 |---|---|---|
-| `BASE_IMAGE` | `ubuntu:24.04` | Base image (only Ubuntu 24.04 is tested so far) |
+| `BASE_IMAGE` | `debian:trixie-slim` | Base image; CI tests Debian trixie, Ubuntu 24.04 is known to work too |
 | `XLINGS_VERSION` | `2026.10.26.1` | Pinned xlings release version |
 | `XLINGS_DOWNLOAD_BASE` | GitHub releases | Base URL for release downloads; can point at a mirror |
 | `XLINGS_DEFAULT_MIRROR` | `GLOBAL` | Default package index mirror written into the home (`GLOBAL` / `CN`) |
@@ -182,7 +182,7 @@ docker run --rm -it -v xlings-home:/home/dev/.xlings xlings-docker:dev \
 | Tag | Contents |
 |---|---|
 | `2026.10.26.1` | Pinned xlings version |
-| `2026.10.26.1-ubuntu24.04` | Version + base image |
+| `2026.10.26.1-debian-trixie` | Version + base image |
 | `latest` | Latest stable combination |
 | `sha-<short>` | Corresponding commit |
 

@@ -6,7 +6,10 @@
 #   SMOKE_NETWORK=0 IMAGE=xlings-docker:dev ./tests/smoke.sh   # no package downloads
 #
 # Network tests install ninja@1.12.1, the same tiny static probe the upstream
-# xlings CI uses. They need access to the package index and resource server.
+# xlings CI uses, plus node: a glibc-linked payload whose ELF interpreter
+# xlings must rewrite to its own glibc package. ninja alone cannot catch a
+# broken glibc/elfpatch chain, because it is a static binary. They need access
+# to the package index and resource server.
 
 set -euo pipefail
 
@@ -16,6 +19,7 @@ ROOT="$(cd "${HERE}/.." && pwd)"
 IMAGE="${IMAGE:-xlings-docker:test}"
 XLINGS_VERSION="${XLINGS_VERSION:-$(sed -n 's/^ARG XLINGS_VERSION=//p' "${ROOT}/Dockerfile")}"
 NINJA_VERSION="${NINJA_VERSION:-1.12.1}"
+NODE_VERSION="${NODE_VERSION:-24.21.0}"
 SMOKE_UID="${SMOKE_UID:-1000}"
 SMOKE_NETWORK="${SMOKE_NETWORK:-1}"
 SMOKE_DERIVED="${SMOKE_DERIVED:-${SMOKE_NETWORK}}"
@@ -170,6 +174,28 @@ if command -v ninja >/dev/null 2>&1; then
 fi
 SCRIPT
     ok "global install/remove works"
+
+    section "glibc-linked package runs on the image's own glibc"
+    # node is a dynamically linked upstream build. xlings installs its glibc
+    # package and patches node's PT_INTERP to point at it, so the base image's
+    # libc version must not matter. The interpreter string is read straight out
+    # of the ELF, since the image ships no readelf.
+    run docker run --rm -i -e NODE_VERSION="$NODE_VERSION" "$IMAGE" bash -s <<'SCRIPT'
+set -euo pipefail
+xlings install -y -g "node@${NODE_VERSION}"
+node --version | grep -qx "v${NODE_VERSION}"
+node -e 'process.exit(typeof process.versions.node === "string" ? 0 : 1)'
+payload="$(find "$HOME/.xlings/data/xpkgs" -path '*node*' -type f -name node -perm -u+x | head -n 1)"
+[ -n "$payload" ] || { echo "node payload not found under data/xpkgs" >&2; exit 1; }
+interp="$(grep -aom1 '/[^[:cntrl:]]*/ld-linux-[^[:cntrl:]]*\.so\.[0-9]' "$payload" || true)"
+echo "interpreter: ${interp:-<none>}"
+case "$interp" in
+    "$HOME"/.xlings/*) ;;
+    *) echo "node still uses the host loader: ${interp:-<none>}" >&2; exit 1 ;;
+esac
+xlings remove node -y
+SCRIPT
+    ok "node runs through xlings' glibc, not the host's"
 
     section "project install from .xlings.json"
     new_tmp; dir="$NEW_TMP"

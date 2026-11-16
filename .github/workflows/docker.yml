@@ -133,7 +133,7 @@ jobs:
           images: ${{ steps.image.outputs.value }}
           tags: |
             type=raw,value=${{ steps.version.outputs.value }}
-            type=raw,value=${{ steps.version.outputs.value }}-ubuntu24.04
+            type=raw,value=${{ steps.version.outputs.value }}-debian-trixie
             type=raw,value=latest
             type=sha,prefix=sha-
 
