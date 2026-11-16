@@ -95,10 +95,16 @@ USER root
 # A snapshot of the initialized home. An empty bind mount over
 # /home/dev/.xlings hides the home baked into the image; the entrypoint
 # restores this snapshot offline instead of re-running `self install`.
-RUN tar -czf /opt/xlings/home.tar.gz \
-        --exclude=./.xlings.lock \
-        -C /home/dev/.xlings . \
-    && chmod 0644 /opt/xlings/home.tar.gz
+#
+# The archive lists the home's top-level entries, not ".": a bind mount's root
+# belongs to the host user, and a "." member makes tar try to restore (or,
+# with --no-overwrite-dir on Debian's tar, temporarily change) its mode, which
+# fails with "Operation not permitted" for the non-root dev user. Without that
+# member tar never touches the mount point itself.
+RUN find /home/dev/.xlings -mindepth 1 -maxdepth 1 ! -name .xlings.lock -printf '%P\0' \
+        | tar -czf /opt/xlings/home.tar.gz -C /home/dev/.xlings --null -T - \
+    && chmod 0644 /opt/xlings/home.tar.gz \
+    && tar -tzf /opt/xlings/home.tar.gz | grep -x 'bin/xlings' >/dev/null
 
 LABEL org.opencontainers.image.title="xlings" \
       org.opencontainers.image.description="xlings package manager in a container: interactive install, remove and run, with project-level .xlings.json support." \

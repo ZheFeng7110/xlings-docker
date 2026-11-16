@@ -41,11 +41,12 @@ restore_home() {
     if [ "$XLINGS_HOME" = "$baked_home" ] && [ -f "$home_snapshot" ]; then
         log "xlings home ${XLINGS_HOME} is empty; restoring the image's home snapshot"
         mkdir -p "$XLINGS_HOME"
-        # --no-overwrite-dir: a bind mount's root belongs to the host user, so
-        # restoring the archive's metadata for "." (mode, mtime) fails with
-        # "Operation not permitted" and tar exits 2. Keep the mount point as the
-        # host set it up; everything inside is still restored.
-        tar --no-overwrite-dir -xzf "$home_snapshot" -C "$XLINGS_HOME"
+        # The snapshot has no "." member (see the Dockerfile), so tar never
+        # touches the mount point itself: a bind mount's root belongs to the
+        # host user and the dev user cannot change its mode or mtime. Do not
+        # add --no-overwrite-dir here: Debian's tar 1.35 still chmods an
+        # existing directory under that flag and fails the same way.
+        tar -xzf "$home_snapshot" -C "$XLINGS_HOME"
         log "restored $(xlings --version 2>/dev/null || echo 'xlings (unknown version)')"
         return 0
     fi
