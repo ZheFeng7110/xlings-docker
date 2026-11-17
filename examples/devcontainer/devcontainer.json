@@ -1,9 +1,6 @@
 {
   "name": "xlings",
-  "build": {
-    "dockerfile": "../../Dockerfile",
-    "context": "../.."
-  },
+  "image": "ghcr.io/zhefeng7110/xlings-docker:latest",
   "remoteUser": "dev",
   "workspaceFolder": "/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",

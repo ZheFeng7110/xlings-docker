@@ -1,9 +1,6 @@
 services:
   xlings:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    image: xlings-docker:dev
+    image: ghcr.io/zhefeng7110/xlings-docker:latest
     working_dir: /workspace
     command: ["bash"]
     stdin_open: true
